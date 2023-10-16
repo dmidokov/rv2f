@@ -46,7 +46,6 @@ export class Organizations {
     }
 
     public async getCurrentOrganizationName(): Promise<string> {
-
         const link = (new UrlBuilder()).build("api/organizations/current")
 
         let result = await (new Requests()).get(link)
