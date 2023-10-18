@@ -67,8 +67,8 @@ body {
     justify-content: flex-start;
     font-family: 'Roboto';
     font-style: normal;
-
     background: var(--background);
+    color : var(--text-black);
 }
 
 h1 {

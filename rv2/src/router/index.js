@@ -8,6 +8,7 @@ import Users from "../components/Users.vue";
 import Settings from "../components/Settings.vue";
 import Money from "../components/Money.vue"
 import Branches from "../components/Branches.vue";
+import Main from '../components/Main.vue'
 
 const routes = [
     {
@@ -15,7 +16,7 @@ const routes = [
         name: 'main',
         components: {
             navigation: Leftbar,
-            content: Organizations
+            content: Main
         },
     },
     {

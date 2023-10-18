@@ -24,8 +24,7 @@ export default {
 </script>
 
 <template>
-  <LeftBar/>
-  <Organizations/>
+  MAIN
 </template>
 
 <style scoped>
