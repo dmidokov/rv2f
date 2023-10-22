@@ -16,7 +16,7 @@
       <img
           @click="logout()"
           class="sidebar-icon"
-          src="/icons/exit.svg"
+          src="/icons/logout.svg"
       />
     </div>
   </div>

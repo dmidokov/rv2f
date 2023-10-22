@@ -22,7 +22,7 @@
             :data-id="branch.id"
             :data-name="branch.name"
             src="/icons/close-icon-red.svg"
-            @click="deleteOrganization"
+            @click="deleteBranch"
         >
       </div>
     </div>
@@ -39,7 +39,7 @@
       :header="confirmationModalHeader"
       :action="confirmFunc"
       :confirmButtonTitle="confirmButtonTitle"
-      @orgDeleted="loadOrganizations"
+      @orgDeleted="loadBranches"
       ref="actionModal"
   />
 
@@ -51,8 +51,10 @@ import ButtonAdd from "./Buttons/ButtonAdd.vue";
 import ModalAddNewBranch from "./Modals/ModalAddNewBranch.vue";
 import Confirmation from "./Modals/Confirmation.vue";
 import {ModalsManager} from "../js/ModalsManager";
+import {Organizations} from "../js/Organizations";
 
 export default {
+  // todo: add ESC event for window closing
   name: "Branches",
   components: {ButtonAdd, ModalAddNewBranch, Confirmation},
   data() {
@@ -60,6 +62,9 @@ export default {
       branches: "",
       addNewBranchText: "Add New",
       modals: new ModalsManager(),
+      confirmationModalHeader: "",
+      confirmFunc: null,
+      confirmButtonTitle : "",
     }
   },
   methods: {
@@ -80,6 +85,31 @@ export default {
 
         this.branches = r
       })
+    },
+    deleteBranch(event) {
+      this.$refs.actionModal.showModal()
+      this.modals.add(this.$refs.actionModal.closeModal)
+
+      this.confirmationModalHeader = "Вы действительно хотите удалить компанию " + event.target.getAttribute("data-name")
+      this.confirmButtonTitle = "Yes"
+
+      const companyId = event.target.getAttribute("data-id")
+
+      this.confirmFunc = (function (context, Id) {
+        const ctx = context;
+        const companyId = Id;
+
+        return (async function () {
+          let branch = new Branches()
+
+          const result = await branch.delete(companyId)
+
+          if (result) {
+            ctx.loadBranches(ctx)
+            ctx.$refs.actionModal.closeModal()
+          }
+        })
+      })(this, companyId)
     },
   },
   beforeMount() {
