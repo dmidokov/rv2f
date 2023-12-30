@@ -2,7 +2,7 @@
   <div class="sidebar">
     <div class="company-name">{{ organizationName }}</div>
     <div class="sidebar-background"></div>
-
+    <canvas id="canvas" width="600" height="600" class="canvas"></canvas>
   </div>
 </template>
 
@@ -19,7 +19,9 @@ export default {
   methods: {
     loadOrganizationName() {
       let org = new Organizations()
-      org.getCurrentOrganizationName().then(r => {this.organizationName = r['name']})
+      org.getCurrentOrganizationName().then(r => {
+        this.organizationName = r['name']
+      })
     },
   },
   beforeMount() {
@@ -36,8 +38,8 @@ export default {
   align-items: flex-end;
   justify-content: flex-end;
   background: var(--background-accent-themed);
+  position: relative;
   /*border-left:10px solid var(--stroke-cyan);*/
-
 }
 
 .sidebar-background {
@@ -62,5 +64,9 @@ export default {
 
 .company-name:first-letter {
   text-transform: uppercase;
+}
+
+.canvas {
+  position: absolute;
 }
 </style>

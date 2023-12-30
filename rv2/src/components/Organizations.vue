@@ -11,8 +11,8 @@
     <div class="organization-line organization-line-background" v-for="org in organizations">
       <div class="table-cell">{{ org.name }}</div>
       <div class="table-cell">{{ org.host }}</div>
-      <div class="table-cell">{{ org['create-time'] }}</div>
-      <div class="table-cell">{{ org['update-time'] }}</div>
+      <div class="table-cell">{{ formatDate(org['create-time']) }}</div>
+      <div class="table-cell">{{ formatDate(org['update-time']) }}</div>
       <div class="table-cell">
         <img
             :data-id="org.id"
@@ -30,7 +30,7 @@
     </div>
   </div>
 
-  <modal-add-new-organization @orgAdded="loadOrganizations" ref="modal"/>
+  <modal-add-new-organization @orgAdded="pushOrganization" ref="modal"/>
   <confirmation
       :header="confirmationModalHeader"
       :action="confirmFunc"
@@ -47,6 +47,7 @@ import ButtonAdd from "./Buttons/ButtonAdd.vue";
 import ModalAddNewOrganization from "./Modals/ModalAddNewOrganization.vue";
 import Confirmation from "./Modals/Confirmation.vue";
 import {ModalsManager} from "../js/ModalsManager";
+import {Helpers} from "../js/Helpers";
 
 export default {
   name: "Organizations",
@@ -63,6 +64,9 @@ export default {
     }
   },
   methods: {
+    formatDate(time) {
+      return Helpers.formatDate(time)
+    },
     openModal() {
       this.$refs.modal.showModal()
       this.modals.add(this.$refs.modal.closeModal)
@@ -71,15 +75,20 @@ export default {
       let org = new Organizations()
 
       org.load().then(r => {
-        for (let i in r) {
-          if (r[i].hasOwnProperty("create-time") && r[i].hasOwnProperty("update-time")) {
-            r[i]["create-time"] = new Date(r[i]["create-time"] * 1000).toLocaleString()
-            r[i]["update-time"] = new Date(r[i]["update-time"] * 1000).toLocaleString()
-          }
-        }
-
         this.organizations = r
       })
+    },
+    pushOrganization(e) {
+      this.organizations.push(
+          {
+            'id': e.id,
+            'host': e.host,
+            'name': e.name,
+            'creator': e.creator,
+            'create-time': e['create-time'],
+            'update-time': e['update-time'],
+          }
+      )
     },
     deleteOrganization(event) {
       this.$refs.actionModal.showModal()

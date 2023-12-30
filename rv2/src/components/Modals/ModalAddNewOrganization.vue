@@ -1,46 +1,53 @@
 <template>
-
-  <div class="modal modal-shadow" v-if="show" id="addOrganizationModal">
-    <div class="modal-content-clock">
-      <div class="modal-header">
-        <div>New Organization</div>
+  <div class="modal-back" v-if="show" @click.self="closeModal">
+    <div class="modal modal-shadow" id="addOrganizationModal">
+      <div class="modal-content-clock">
+        <div class="modal-header">
+          <div>New Organization</div>
+        </div>
+        <div class="modal-centered">
+          <input-standard
+              v-model="orgName"
+              placeholder="Name"
+              inputid="org_name"
+              inputname="org_new"
+          />
+        </div>
+        <div class="modal-centered">
+          <input-standard
+              v-model="orgHost"
+              placeholder="Host"
+              inputid="org_host"
+              inputname="org_new"
+          />
+        </div>
+        <div class="modal-centered">
+          <input-standard
+              v-model="orgAdminName"
+              placeholder="Admin Name"
+              inputid="org_adm_name"
+              inputname="org_new"
+          />
+        </div>
+        <div class="modal-centered">
+          <input-standard
+              v-model="orgAdminPassword"
+              placeholder="Admin Password"
+              inputid="org_adm_pass"
+              type="password"
+              inputname="org_new"
+          />
+        </div>
+        <div class="modal-centered">
+          <button-add :button-text="addOrgText" @click="addOrganization"/>
+        </div>
       </div>
-      <div class="modal-centered">
-        <input-standard
-            v-model="orgName"
-            placeholder="Name"
-            inputid="id-1"
-        />
+      <div class="modal-close-button" @click="closeModal">
+        <img src="/icons/close-icon-red.svg">
       </div>
-      <div class="modal-centered">
-        <input-standard
-            v-model="orgHost"
-            placeholder="Host"
-            inputid="id-1"
-        />
-      </div>
-      <div class="modal-centered">
-        <input-standard
-            v-model="orgAdminName"
-            placeholder="Admin Name"
-            inputid="id-1"
-        />
-      </div>
-      <div class="modal-centered">
-        <input-standard
-            v-model="orgAdminPassword"
-            placeholder="Admin Password"
-            inputid="id-1"
-        />
-      </div>
-      <div class="modal-centered">
-        <button-add :button-text="addOrgText" @click="addOrganization"/>
-      </div>
-    </div>
-    <div class="modal-close-button" @click="closeModal">
-      <img src="/icons/close-icon-red.svg">
     </div>
   </div>
+
 </template>
 
 <script>
@@ -49,6 +56,8 @@ import InputStandard from "../Inputs/InputStandart.vue";
 import InputStandardCentered from "../Inputs/InputStandartCentered.vue";
 import ButtonAdd from "../Buttons/ButtonAdd.vue";
 import {Organizations} from "../../js/Organizations";
+import {Helpers} from "../../js/Helpers"
+import {Notification} from "../../js/Notification/Notification";
 
 export default {
   name: "ModalAddNewOrganization",
@@ -72,20 +81,84 @@ export default {
       this.show = false;
     },
     async addOrganization() {
-      let result = await new Organizations().create({
-        "name": this.orgName.trim(),
-        "host": this.orgHost.trim(),
-        "user-name": this.orgAdminName.trim(),
-        "user-pass": this.orgAdminPassword.trim()
-      })
-      if (result) {
-        this.$emit('orgAdded')
+
+      this.unmarkFieldsWithError()
+
+      let org = new Organizations(
+          this.orgName.trim(),
+          this.orgHost.trim(),
+          this.orgAdminName.trim(),
+          this.orgAdminPassword.trim()
+      )
+
+      let check = org.checkFields()
+
+      if (!check) {
+        this.markFieldsWithError(org.getCheckErrors())
+        return
+      }
+
+      let result = await org.create()
+
+      if (result.status == 'OK') {
+        this.$emit('orgAdded', result.data)
+
+        new Notification(
+            Helpers.printf(
+                'New organization with name {1} and user {2} was created',
+                this.orgName.trim(),
+                this.orgAdminName.trim()),
+            Notification.typeNotification,
+            true,
+            7000
+        )
+
         this.closeModal()
       } else {
-        console.log("Not added")
+        new Notification(
+            Helpers.printf(
+                'The organization was not created due to an error: {1}',
+                result.error
+            ),
+            Notification.typeError,
+            true,
+            7000
+        )
       }
+    },
+    markFieldsWithError(errors) {
+      this.unmarkFieldsWithError()
+      errors.forEach(
+          error => {
+            let message = ""
+            switch (error) {
+              case "name" :
+                document.getElementById("org_name").classList.add("error-input")
+                message = "InvalidOrgName"
+                break
+              case "host" :
+                document.getElementById("org_host").classList.add("error-input")
+                message = "InvalidOrgHost"
+                break
+              case "adminName" :
+                document.getElementById("org_adm_name").classList.add("error-input")
+                message = "InvalidOrgAdminName"
+                break
+              case "adminPassword" :
+                document.getElementById("org_adm_pass").classList.add("error-input")
+                message = "InvalidOrgAdminPassword"
+                break
+            }
+            new Notification(message, Notification.typeWarning, true, 7000)
+          }
+      )
+    },
+    unmarkFieldsWithError() {
+      let fields = document.getElementsByName("org_new")
+      fields.forEach(field => {
+        field.classList.remove("error-input")
+      })
     }
-
   }
 }
 </script>
@@ -145,5 +218,23 @@ export default {
 .modal-close-button img {
   width: 48px;
   height: 48px;
+}
+
+.modal-close-button:hover {
+  transition-duration: 0.5s;
+  transform: rotate(45deg);
+}
+
+.modal-back {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  background: var(--background-table-row-light-alpha-24);
+}
+
+.error-input {
+  border: 2px solid var(--button-background-negative)
 }
 </style>

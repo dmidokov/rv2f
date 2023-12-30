@@ -1,0 +1,8 @@
+FROM node:latest
+WORKDIR /build
+COPY . .
+RUN npm install yarn
+RUN yarn version
+RUN yarn
+RUN yarn add vue-router@4
+RUN yarn build

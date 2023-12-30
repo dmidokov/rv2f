@@ -9,6 +9,7 @@ import Settings from "../components/Settings.vue";
 import Money from "../components/Money.vue"
 import Branches from "../components/Branches.vue";
 import Main from '../components/Main.vue'
+import Account from '../components/Account.vue'
 
 const routes = [
     {
@@ -79,6 +80,14 @@ const routes = [
             content: Branches
         },
     },
+    {
+        path: '/account',
+        name: 'account',
+        components: {
+            navigation: Leftbar,
+            content: Account
+        },
+    }
 ]
 
 const router = createRouter({

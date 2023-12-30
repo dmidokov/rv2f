@@ -4,13 +4,14 @@
         v-model="value"
         :placeholder="placeholder"
         :id="inputid"
+        :name="inputname"
     >
 </template>
 
 <script>
 export default {
   name: "InputStandart",
-  props: ["placeholder", "inputid", "orgName"],
+  props: ["placeholder", "inputid", "orgName", "inputname"],
   data() {
     return {
       value: ""

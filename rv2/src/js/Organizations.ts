@@ -4,6 +4,21 @@ import {Notification} from "./Notification/Notification";
 
 
 export class Organizations {
+
+    private name: string
+    private host: string
+    private adminName: string
+    private adminPassword: string
+
+    private checkErrors: Array<string> = []
+
+    public constructor(name, host, adminName, adminPassword: string) {
+        this.name = name
+        this.host = host
+        this.adminPassword = adminPassword
+        this.adminName = adminName
+    }
+
     public async load(): Promise<object> {
 
         const link = (new UrlBuilder()).build("api/organizations")
@@ -18,14 +33,24 @@ export class Organizations {
         }
     }
 
-    public async create(data: Object) {
+    public async create(): Promise<Object> {
         const link = (new UrlBuilder()).build("api/organizations")
-        let result = await (new Requests()).put(link, data)
-        if (result.ok) {
-            return true
+        let result = await (new Requests()).put(link, this.buildCreate())
+        let json = await result.json()
+
+        if (json.status == "OK") {
+            return json
         } else {
-            new Notification("Error", Notification.typeError)
-            return false
+            return {'status': 'error', 'error': json.error}
+        }
+    }
+
+    private buildCreate(): Object {
+        return {
+            "name": this.name,
+            "host": this.host,
+            "user-name": this.adminName,
+            "user-pass": this.adminPassword
         }
     }
 
@@ -54,8 +79,29 @@ export class Organizations {
             json = await result.json()
             return json.data
         } else {
-             return  ""
+            return ""
         }
     }
 
+    public checkFields(): boolean {
+        this.checkErrors = []
+        if (this.name.length < 3) {
+            this.checkErrors.push("name")
+        }
+        if (this.host.length < 3 || !this.host.match("\\w+\\.\\w+\\.\\w+")) {
+            this.checkErrors.push("host")
+        }
+        if (this.adminName.length < 3) {
+            this.checkErrors.push("adminName")
+        }
+        if (this.adminPassword.length < 3) {
+            this.checkErrors.push("adminPassword")
+        }
+        console.log(this.checkErrors)
+        return this.checkErrors.length == 0
+    }
+
+    public getCheckErrors(): Array<string> {
+        return this.checkErrors
+    }
 }

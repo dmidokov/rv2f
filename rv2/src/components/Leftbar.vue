@@ -3,7 +3,8 @@
     <div class="sidebar-sub-block sidebar-top-block">
       <div class="account-icon icon-shadow">
         <img
-            src="/icons/img_4.png"
+            id="accountIcon"
+            :src="accountIcon"
         >
       </div>
     </div>
@@ -26,6 +27,7 @@
 import {Auth} from "../js/Auth"
 import {Navigation} from "../js/Navigation"
 import LeftBarNavigation from "../components/LeftBarNavigation.vue"
+import {Users} from "../js/Users";
 
 export default {
   name: "LeftBar",
@@ -33,7 +35,8 @@ export default {
   data() {
     return {
       organizations: {},
-      navigation: []
+      navigation: [],
+      accountIcon: '/icons/img.png',
     }
   }
   ,
@@ -48,10 +51,16 @@ export default {
       nav.load().then(r => {
         this.navigation = r
       })
+    },
+    getAccountIcon() {
+      (new Users()).getIcon().then(res => {
+        this.accountIcon = (res ?? '/icons/img.png')
+      })
     }
   },
   beforeMount() {
     this.showNavigation()
+    this.getAccountIcon()
 
     let timer = setInterval(async function () {
       let response = await new Auth().authCheck()

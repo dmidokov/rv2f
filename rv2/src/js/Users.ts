@@ -46,4 +46,16 @@ export class Users {
         }
     }
 
+    public async getIcon() {
+        const link = (new UrlBuilder()).build("api/users/icon")
+        let result = await (new Requests()).get(link)
+        if (result.ok) {
+            let json = await result.json()
+            if (json.data["image-name"]) {
+                return json.data["image-name"]
+            } else {
+                return null
+            }
+        }
+    }
 }

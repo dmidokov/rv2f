@@ -25,6 +25,8 @@
     --background-content: #FFFFFF;
     --background-table-row-light-alpha-4: rgba(0,28,61,0.04);
     --background-table-row-light-alpha-8: rgba(0,28,61,0.08);
+    --background-table-row-light-alpha-16: rgba(0,28,61,0.16);
+    --background-table-row-light-alpha-24: rgba(0,28,61,0.24);
 
     --text-white: #FFFFFF;
     --text-black: #000000;
