@@ -27,7 +27,7 @@
       <div class="user-info-table" v-for="line in prop1.userRightsWithDesription">
         <div class="user-info-table-row">
           <input class="custom-checkbox" type="checkbox" :data-value="line.value" :id="line.name" :name="line.name"
-                 :checked="checkedBox(line.value)" @change="updateRight">
+                 :checked="checkedBox(line.value)" @change="update">
           <label :for="line.name">{{ line.name }}</label>
         </div>
       </div>
@@ -45,7 +45,7 @@ export default {
     checkedBox(value) {
       return this.prop1.userRights != null && this.prop1.userRights.includes(value)
     },
-    updateRight(event) {
+    update(event) {
       let users = new Users()
       let data = {
         "userId": Number(this.userId),
@@ -53,8 +53,7 @@ export default {
         "set": event.target.checked
       }
 
-      users.updateRight(data)
-
+      users.update(data, [{name: "field", value: "rights"}])
     }
   },
   beforeMount() {

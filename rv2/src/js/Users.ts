@@ -2,10 +2,15 @@ import {UrlBuilder} from "./UrlBuilder";
 import {Requests} from "./Requests";
 import {Notification} from "./Notification/Notification";
 
-export type UpdateRightRequest = {
+type UpdateRightRequest = {
     id: number,
     value: number
     set: boolean
+}
+
+export type Params = {
+    name: string,
+    value: string
 }
 
 export class Users {
@@ -82,8 +87,8 @@ export class Users {
 
     }
 
-    public async updateRight(data: UpdateRightRequest) {
-        const link = (new UrlBuilder()).build("api/users/rights")
+    public async update(data: UpdateRightRequest, params: Array<Params>) {
+        const link = (new UrlBuilder()).build("api/users/update", params)
         let result = await (new Requests()).post(link, data)
         if (result.ok) {
             return true
