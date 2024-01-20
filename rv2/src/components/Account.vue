@@ -66,7 +66,7 @@ export default {
               phoneImage.setAttribute("width", imageMaxWidth())
 
             }
-            img.src = "/icons/" + r['image-name'];
+            img.src = r['image-name'];
           });
     },
     down(event) {
@@ -108,7 +108,7 @@ export default {
 
                 ctx.drawImage(img, 0, 0, imageMaxWidth(), img.height * coff)
               }
-              document.getElementById("accountIcon").src = "/icons/" + r['image-name'];
+              document.getElementById("accountIcon").src = r['image-name'];
             });
       }, 'image/png');
     },
@@ -224,8 +224,8 @@ export default {
   display: none;
 }
 
-.image{
-  min-width:1000px;
+.image {
+  min-width: 1000px;
   text-align: center;
 }
 </style>

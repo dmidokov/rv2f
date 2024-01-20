@@ -2,7 +2,15 @@ import {UrlBuilder} from "./UrlBuilder";
 import {Requests} from "./Requests";
 import {Notification} from "./Notification/Notification";
 
+export type UpdateRightRequest = {
+    id: number,
+    value: number
+    set: boolean
+}
+
 export class Users {
+
+
     public async load(): Promise<object> {
 
         const link = (new UrlBuilder()).build("api/users")
@@ -56,6 +64,33 @@ export class Users {
             } else {
                 return null
             }
+        }
+    }
+
+    public async get(id: number): Promise<object> {
+
+        const link = (new UrlBuilder()).build("api/users/" + id.toString())
+
+        let result = await (new Requests()).get(link)
+        let json;
+        if (result.ok) {
+            json = await result.json()
+            return json.data
+        } else {
+            return []
+        }
+
+    }
+
+    public async updateRight(data: UpdateRightRequest) {
+        const link = (new UrlBuilder()).build("api/users/rights")
+        let result = await (new Requests()).post(link, data)
+        if (result.ok) {
+            return true
+        } else {
+            let errorText = await result.text()
+            new Notification(errorText, Notification.typeError)
+            return false
         }
     }
 }

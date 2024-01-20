@@ -9,7 +9,6 @@ export class Branches {
         const link = (new UrlBuilder()).build("api/branches")
 
         let result = await (new Requests()).get(link)
-        console.log(result)
         let json;
         if (result.ok) {
             json = await result.json()
@@ -59,6 +58,29 @@ export class Branches {
         } else {
              return  ""
         }
+    }
+
+    public async getCurrentUserBranches() {
+        const link = (new UrlBuilder()).build("api/branches/")
+    }
+
+    public async setUserActiveBranch(branchId: number){
+        console.log(branchId)
+        const url = (new UrlBuilder()).build("api/branches/active/" + branchId.toString())
+        console.log(url)
+        let result = await (new Requests()).post(url)
+        let json
+        if (result.ok) {
+            console.log("selected")
+            return true
+        } else {
+            result.text().then(
+                text => {
+                    new Notification(text, Notification.typeError)
+                }
+            )
+        }
+        return false
     }
 
 }

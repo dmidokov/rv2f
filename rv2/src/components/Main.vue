@@ -2,7 +2,6 @@
 import LeftBar from "./Leftbar.vue";
 import Organizations from "./Organizations.vue";
 import {Auth} from "../js/Auth";
-import {Requests} from "../js/Requests";
 
 export default {
   name: "Main",
@@ -16,8 +15,8 @@ export default {
       } else {
         console.log("Not redirect")
       }
-    }, 1000),
-    this.subscribeToEvent()
+    }, 1000)
+    // this.subscribeToEvent()
   }
 }
 
@@ -28,9 +27,6 @@ export default {
 </template>
 
 <style scoped>
-.read-the-docs {
-  color: #888;
-}
 
 div {
   /*border: 1px solid rebeccapurple;*/

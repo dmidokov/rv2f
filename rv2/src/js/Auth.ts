@@ -19,8 +19,15 @@ export class Auth {
                     response
                         .json()
                         .then(json => {
-                            if (json["status"] === "OK") {
-                                window.location.href = "/"
+                            console.log(json["data"]["startPage"])
+                            console.log(json["data"])
+                            if (json["status"] === "ok") {
+                                console.log(json["data"]["startPage"])
+                                if (json["data"]["startPage"] !== "undefined") {
+                                    window.location.href = json["data"]["startPage"]
+                                } else {
+                                    window.location.href = "/"
+                                }
                                 return true
                             } else {
                                 if (json['status'] == "Error") {

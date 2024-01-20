@@ -10,6 +10,7 @@ import Money from "../components/Money.vue"
 import Branches from "../components/Branches.vue";
 import Main from '../components/Main.vue'
 import Account from '../components/Account.vue'
+import BranchSelector from "../components/BranchSelector.vue";
 
 const routes = [
     {
@@ -87,6 +88,14 @@ const routes = [
             navigation: Leftbar,
             content: Account
         },
+    },
+    {
+        path: '/branchselector',
+        name: 'branchselector',
+        components: {
+            navigation: Leftbar,
+            content: BranchSelector
+        }
     }
 ]
 
@@ -99,10 +108,8 @@ router.beforeEach(async (to, from, next) => {
     if (to.name !== 'login') {
         let response = await new Auth().authCheck()
         if (!response) {
-            console.log("true")
             next({name: 'login'})
         } else {
-            console.log("false")
             next.call()
         }
     } else {

@@ -73,9 +73,9 @@ export default {
       this.modals.add(this.$refs.modal.closeModal)
     },
     loadBranches() {
-      let org = new Branches()
+      let branches = new Branches()
 
-      org.load().then(r => {
+      branches.load().then(r => {
         for (let i in r) {
           if (r[i].hasOwnProperty("createTime") && r[i].hasOwnProperty("updateTime")) {
             r[i]["createTime"] = new Date(r[i]["createTime"] * 1000).toLocaleString()
@@ -193,5 +193,13 @@ export default {
   top: 100%;
   right: 0%;
   padding: 10px;
+}
+.title {
+  position: absolute;
+  left: 15px;
+  top: -45px;
+  display: inline-block;
+  font-size: 30px;
+  color: var(--text-input);
 }
 </style>

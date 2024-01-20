@@ -19,6 +19,7 @@
             :data-name="org.name"
             src="/icons/close-icon-red.svg"
             @click="deleteOrganization"
+            alt="delete organization"
         >
       </div>
     </div>
@@ -131,7 +132,7 @@ export default {
     }
   },
   beforeMount() {
-    this.subscribeToEvent()
+    // this.subscribeToEvent()
     this.loadOrganizations()
     document.addEventListener("keyup", this.closeLast)
   }

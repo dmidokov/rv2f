@@ -5,18 +5,27 @@
       <div class="table-cell">Name</div>
       <div class="table-cell">Create Time</div>
       <div class="table-cell">Update Time</div>
+      <div class="table-cell">User Type</div>
       <div class="table-cell">Actions</div>
     </div>
-    <div class="user-line user-line-background" v-for="user in users">
-      <div class="table-cell">{{ user.userName }}</div>
-      <div class="table-cell">{{ user.createTime }}</div>
-      <div class="table-cell">{{ user.updateTime }}</div>
-      <div class="table-cell">
+    <div
+        :name="'user-line-' + user.id"
+        :data-line-index="'user-line-' + user.id"
+        @click="showUserInfo"
+        class="user-line user-line-background"
+        v-for="user in users"
+    >
+      <div :data-line-index="'user-line-' + user.id" class="table-cell">{{ user.userName }}</div>
+      <div :data-line-index="'user-line-' + user.id" class="table-cell">{{ user.createTime }}</div>
+      <div :data-line-index="'user-line-' + user.id" class="table-cell">{{ user.updateTime }}</div>
+      <div :data-line-index="'user-line-' + user.id" class="table-cell">{{ user.type }}</div>
+      <div :data-line-index="'user-line-' + user.id" class="table-cell">
         <img
             :data-id="user.id"
             :data-name="user.userName"
             src="/icons/close-icon-red.svg"
             @click="deleteUser"
+            alt="close"
         >
       </div>
     </div>
@@ -48,10 +57,12 @@ import {ModalsManager} from "../js/ModalsManager";
 import {Users} from "../js/Users";
 import Confirmation from "./Modals/Confirmation.vue";
 import ModalAddNewUser from "./Modals/ModalAddNewUser.vue";
+import UserInfo from "./userInfo.ce.vue";
+import {defineCustomElement} from "vue";
 
 export default {
   name: "Users",
-  components: {ButtonAdd, Confirmation, ModalAddNewUser},
+  components: {ButtonAdd, Confirmation, ModalAddNewUser, UserInfo},
   data() {
     return {
       users: [],
@@ -60,7 +71,8 @@ export default {
       confirmFunc: null,
       confirmButtonTitle: "",
       modals: new ModalsManager(),
-      addNewUserText: "Add New"
+      addNewUserText: "Add New",
+      UserInfoDynamic: null,
     }
   },
   methods: {
@@ -76,9 +88,42 @@ export default {
             r[i]["createTime"] = new Date(r[i]["createTime"] * 1000).toLocaleString()
             r[i]["updateTime"] = new Date(r[i]["updateTime"] * 1000).toLocaleString()
           }
+          switch (r[i]["type"]) {
+            case 0 :
+              r[i]["type"] = "Service"
+              break
+            case 1:
+              r[i]["type"] = "Employee"
+              break
+            default:
+              r[i]["type"] = "Unknown"
+          }
         }
         this.users = r
       })
+    },
+    async showUserInfo(event) {
+      let target = event.target
+      let lineName = target.getAttribute("data-line-index")
+      let element = document.getElementsByName(lineName)[0]
+
+      let id = lineName.split("-")[2];
+
+      let user = await (new Users()).get(id)
+
+      if (!document.getElementById(lineName)) {
+        let newElement = new this.UserInfoDynamic({
+          prop1: user,
+          userId: id
+        })
+
+        newElement.setAttribute("id", lineName)
+        newElement.setAttribute('class', 'dynamic-user-info-container')
+
+        element.after(newElement)
+      } else {
+        document.getElementById(lineName).remove()
+      }
     },
     closeLast(event) {
       this.modals.closeLast(event)
@@ -112,11 +157,13 @@ export default {
   beforeMount() {
     this.loadUsers()
     document.addEventListener("keyup", this.closeLast)
+    this.UserInfoDynamic = defineCustomElement(UserInfo)
+    customElements.define('user-info-dynamic', this.UserInfoDynamic)
   }
 }
 </script>
 
-<style scoped>
+<style>
 .users-block {
   background: var(--background-content);
   border: 1px solid var(--stroke-separatot-primary);
@@ -145,6 +192,7 @@ export default {
 .user-line-background:nth-child(odd) {
   background: var(--background-table-row-light-alpha-4);
 }
+
 .user-line-background:nth-child(odd):hover {
   background: var(--background-table-row-light-alpha-8);
 }
@@ -152,6 +200,7 @@ export default {
 .user-line-background:nth-child(even) {
   background: var(--background-table-row-light-alpha-4);
 }
+
 .user-line-background:nth-child(even):hover {
   background: var(--background-table-row-light-alpha-8);
 }
@@ -186,7 +235,18 @@ export default {
 .buttons-block {
   position: absolute;
   top: 100%;
-  right: 0%;
+  right: 0;
   padding: 10px;
+}
+
+.dynamic-user-info-container {
+  border-bottom: 1px solid var(--stroke-separatot-primary);
+  width: 90%;
+  flex-direction: row;
+  display: flex;
+  text-align: center;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  justify-content: left;
 }
 </style>
