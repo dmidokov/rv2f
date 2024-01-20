@@ -36,13 +36,13 @@
 </template>
 
 <script>
-import {Users, UpdateRightRequest} from "../js/Users";
+import {Users} from "../js/Users";
 
 export default {
   name: "userInfo",
   props: ["prop1", "userId"],
   methods: {
-    checkedBox(value): boolean {
+    checkedBox(value) {
       return this.prop1.userRights != null && this.prop1.userRights.includes(value)
     },
     updateRight(event) {
