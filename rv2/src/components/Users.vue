@@ -78,6 +78,7 @@ export default {
   methods: {
     openModal() {
       this.$refs.addUserModal.showModal()
+      this.modals.add(this.$refs.addUserModal.closeModal)
     },
     loadUsers() {
       let users = new Users()
@@ -248,5 +249,7 @@ export default {
   padding-top: 10px;
   padding-bottom: 10px;
   justify-content: left;
+  flex-wrap: wrap;
+  align-content: stretch;
 }
 </style>

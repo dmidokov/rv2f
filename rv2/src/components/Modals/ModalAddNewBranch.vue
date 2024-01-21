@@ -69,6 +69,7 @@ export default {
       this.show = true;
     },
     closeModal() {
+      console.log("close")
       this.show = false;
     },
     async addBranch() {

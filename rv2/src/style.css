@@ -119,6 +119,10 @@ button:focus-visible {
     background: blue;
 }
 
+.ok-button {
+    background: var(--button-background-themed);
+}
+
 @media (prefers-color-scheme: light) {
     :root {
         color: #213547;

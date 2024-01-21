@@ -51,7 +51,6 @@ import ButtonAdd from "./Buttons/ButtonAdd.vue";
 import ModalAddNewBranch from "./Modals/ModalAddNewBranch.vue";
 import Confirmation from "./Modals/Confirmation.vue";
 import {ModalsManager} from "../js/ModalsManager";
-import {Organizations} from "../js/Organizations";
 
 export default {
   // todo: add ESC event for window closing
@@ -71,6 +70,10 @@ export default {
     openModal() {
       this.$refs.modal.showModal()
       this.modals.add(this.$refs.modal.closeModal)
+      console.log(this.modals)
+    },
+    closeLast(event) {
+      this.modals.closeLast(event)
     },
     loadBranches() {
       let branches = new Branches()
@@ -114,6 +117,7 @@ export default {
   },
   beforeMount() {
     this.loadBranches()
+    document.addEventListener("keyup", this.closeLast)
   }
 }
 </script>

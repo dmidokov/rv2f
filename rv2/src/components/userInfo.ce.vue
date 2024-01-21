@@ -21,18 +21,43 @@
     </div>
 
   </div>
+
+
   <div class="user-data-container">
-    <div>
-      <div class="user-data-container-header">Rights</div>
-      <div class="user-info-table" v-for="line in prop1.userRightsWithDesription">
-        <div class="user-info-table-row">
-          <input class="custom-checkbox" type="checkbox" :data-value="line.value" :id="line.name" :name="line.name"
-                 :checked="checkedBox(line.value)" @change="update">
-          <label :for="line.name">{{ line.name }}</label>
-        </div>
+    <div class="user-data-container-header">Rights</div>
+    <div class="user-info-table" v-for="line in prop1.userRightsWithDesription">
+      <div class="user-info-table-row">
+        <input class="custom-checkbox" type="checkbox" :data-value="line.value" :id="line.name" :name="line.name"
+               :checked="checkedBoxRights(line.value)" @change="update" data-type="rights">
+        <label :for="line.name">{{ line.name }}</label>
       </div>
     </div>
   </div>
+
+
+  <div class="user-data-container">
+    <div class="user-data-container-header">Navigation</div>
+    <div class="user-info-table" v-for="line in prop1.navigation">
+      <div class="user-info-table-row">
+        <input class="custom-checkbox" type="checkbox" :data-value="line.id" :id="line.Title" :name="line.Title"
+               :checked="checkedBoxNavigation(line.enabled)" @change="update" data-type="navigation">
+        <label :for="line.Title">{{ line.Title }}</label>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="user-data-container">
+    <div class="user-data-container-header">Hot switch menu</div>
+    <div>
+      <input :id="`input`+prop1.id" type="select" list="hotSwitchUsers">
+      <datalist id="hotSwitchUsers">
+        <option v-for="child in prop1.childs">{{ child.login }}</option>
+      </datalist>
+      <button type="button" class="ok-button" @click="addToHotSwitch">Add</button>
+    </div>
+  </div>
+
 </template>
 
 <script>
@@ -42,8 +67,11 @@ export default {
   name: "userInfo",
   props: ["prop1", "userId"],
   methods: {
-    checkedBox(value) {
+    checkedBoxRights(value) {
       return this.prop1.userRights != null && this.prop1.userRights.includes(value)
+    },
+    checkedBoxNavigation(value) {
+      return value
     },
     update(event) {
       let users = new Users()
@@ -53,7 +81,10 @@ export default {
         "set": event.target.checked
       }
 
-      users.update(data, [{name: "field", value: "rights"}])
+      users.update(data, [{name: "field", value: event.target.getAttribute("data-type")}])
+    },
+    addToHotSwitch(event) {
+        // TODO: Тут надо добавить запрос на добавление пользоваля в таблицу с быстрими сменами
     }
   },
   beforeMount() {
@@ -65,10 +96,10 @@ export default {
 <style>
 .user-icon {
   margin: 10px;
-  border: 1px solid midnightblue;
   display: flex;
   justify-content: center;
   align-items: flex-start;
+  padding: 10px 10px 10px 10px;
 }
 
 .user-icon img {
@@ -78,17 +109,22 @@ export default {
 }
 
 .user-data-container {
-  border: 1px solid deeppink;
+  border: 2px solid var(--stroke-separatot-primary);
   margin: 10px;
   justify-content: flex-start;
   display: flex;
   align-items: flex-start;
   flex-direction: column;
+  padding: 10px 10px 10px 10px;
+  border-radius: 10px;
+  flex-grow: 1;
+  max-width: 500px;
 }
 
 .user-data-container-header {
   font-size: 32px;
-  color: var(--text-input)
+  color: var(--text-input);
+  width: 100%;
 }
 
 .user-info-table {
@@ -171,5 +207,27 @@ export default {
 /* стили для чекбокса, находящегося в состоянии disabled */
 .custom-checkbox:disabled + label::before {
   background-color: #e9ecef;
+}
+
+.ok-button {
+  background: var(--button-background-themed);
+  font-size: 24px;
+  padding: 6px 18px;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+  outline: none;
+  border: none;
+}
+
+input {
+  background: var(--background-secondary);
+  color: var(--text-input);
+  font-size: 24px;
+  padding: 5px 8px;
+  border-top: 1px solid grey;
+  border-bottom: 1px solid grey;
+  border-left: 1px solid grey;
+  border-right: 0px solid transparent;
+  outline: none;
 }
 </style>
