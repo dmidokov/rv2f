@@ -52,7 +52,7 @@
     <div>
       <input :id="`input`+prop1.id" type="select" list="hotSwitchUsers">
       <datalist id="hotSwitchUsers">
-        <option v-for="child in prop1.childs">{{ child.login }}</option>
+        <option :id="child.login" :data-id="child.id" v-for="child in prop1.childs">{{ child.login }}</option>
       </datalist>
       <button type="button" class="ok-button" @click="addToHotSwitch">Add</button>
     </div>
@@ -84,7 +84,24 @@ export default {
       users.update(data, [{name: "field", value: event.target.getAttribute("data-type")}])
     },
     addToHotSwitch(event) {
-        // TODO: Тут надо добавить запрос на добавление пользоваля в таблицу с быстрими сменами
+      // TODO: Тут надо добавить запрос на добавление пользоваля в таблицу с быстрими сменами
+      let users = new Users()
+
+      let shadowRoot = document
+          .getElementById("user-line-" + this.prop1.id)
+          .shadowRoot
+
+      let input = shadowRoot
+          .getElementById("input" + this.prop1.id)
+          .value
+
+      let data = {
+        "fromId": this.prop1.id,
+        "toId": Number(shadowRoot.getElementById(input).getAttribute("data-id"))
+      }
+
+      users.addToSwitcher(data)
+
     }
   },
   beforeMount() {

@@ -98,4 +98,16 @@ export class Users {
             return false
         }
     }
+
+    public async addToSwitcher(data: object) {
+        const link = (new UrlBuilder()).build("api/users/switcher")
+        let result = await (new Requests()).put(link, data)
+        if (result.ok) {
+            return true
+        } else {
+            let errorText = await result.text()
+            new Notification(errorText, Notification.typeError)
+            return false
+        }
+    }
 }
