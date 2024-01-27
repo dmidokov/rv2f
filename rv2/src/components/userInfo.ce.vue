@@ -1,23 +1,23 @@
 <template>
   <div class="user-icon">
-    <img :src=prop1.icon :title="prop1.icon" alt="User Icon">
+    <img :src=user.icon :title="icon" alt="User Icon">
   </div>
   <div class="user-data-container">
     <div class="user-info-line user-name">
-      <b>Login:</b> {{ prop1.userName }}
+      <b>Login:</b> {{ user.userName }}
     </div>
     <div class="user-info-line">
-      <b>Create date: </b>{{ new Date(prop1.createTime).toLocaleString().split(',')[0] }}
+      <b>Create date: </b>{{ new Date(Number(user.createTime)).toLocaleString().split(',')[0] }}
       <br>
-      <b>Create time: </b>{{ new Date(prop1.createTime).toLocaleString().split(',')[1] }}
+      <b>Create time: </b>{{ new Date(Number(user.createTime)).toLocaleString().split(',')[1] }}
     </div>
     <div class="user-info-line">
-      <b>Update date: </b>{{ new Date(prop1.updateTime).toLocaleString().split(',')[0] }}
+      <b>Update date: </b>{{ new Date(Number(user.updateTime)).toLocaleString().split(',')[0] }}
       <br>
-      <b>Update time: </b>{{ new Date(prop1.updateTime).toLocaleString().split(',')[1] }}
+      <b>Update time: </b>{{ new Date(Number(user.updateTime)).toLocaleString().split(',')[1] }}
     </div>
     <div class="user-info-line">
-      <b>Start page:</b> {{ prop1.startPage }}
+      <b>Start page:</b> {{ user.startPage }}
     </div>
 
   </div>
@@ -25,7 +25,7 @@
 
   <div class="user-data-container">
     <div class="user-data-container-header">Rights</div>
-    <div class="user-info-table" v-for="line in prop1.userRightsWithDesription">
+    <div class="user-info-table" v-for="line in user.userRightsWithDesription">
       <div class="user-info-table-row">
         <input class="custom-checkbox" type="checkbox" :data-value="line.value" :id="line.name" :name="line.name"
                :checked="checkedBoxRights(line.value)" @change="update" data-type="rights">
@@ -37,7 +37,7 @@
 
   <div class="user-data-container">
     <div class="user-data-container-header">Navigation</div>
-    <div class="user-info-table" v-for="line in prop1.navigation">
+    <div class="user-info-table" v-for="line in user.navigation">
       <div class="user-info-table-row">
         <input class="custom-checkbox" type="checkbox" :data-value="line.id" :id="line.Title" :name="line.Title"
                :checked="checkedBoxNavigation(line.enabled)" @change="update" data-type="navigation">
@@ -50,62 +50,90 @@
   <div class="user-data-container">
     <div class="user-data-container-header">Hot switch menu</div>
     <div>
-      <input :id="`input`+prop1.id" type="select" list="hotSwitchUsers">
+      <input :id="`input`+user.id" type="select" list="hotSwitchUsers">
       <datalist id="hotSwitchUsers">
-        <option :id="child.login" :data-id="child.id" v-for="child in prop1.childs">{{ child.login }}</option>
+        <option :id="child.login" :data-id="child.id" v-for="child in user.childs">{{ child.login }}</option>
       </datalist>
       <button type="button" class="ok-button" @click="addToHotSwitch">Add</button>
+    </div>
+    <div>
+      <div v-for="hs in user.hotSwitch" class="hot-switch-user-line">
+        <div class="hot-switch-user-name">{{ hs.login }}</div>
+        <div class="hot-switch-user-remove-icon">
+          <img width="20" height="20" src="/icons/close-icon-red.svg" @click="removeHotSwitch(user.id, hs.id)">
+        </div>
+      </div>
     </div>
   </div>
 
 </template>
 
-<script>
-import {Users} from "../js/Users";
+<script setup lang="ts">
+import {defineProps} from "vue";
+import {ChildsItem, NavigationItem, RightsWithDescription, UserResponse, UpdateRightRequest} from "../js/Users"
+
+
+defineProps<{
+  user: UserResponse
+}>()
+</script>
+
+
+<script lang="ts">
+
+import {AddToSwitcherRequest, RemoveFromSwitcherRequest, UpdateRightRequest, Users} from "../js/Users";
 
 export default {
   name: "userInfo",
-  props: ["prop1", "userId"],
+  props: ["user"],
   methods: {
     checkedBoxRights(value) {
-      return this.prop1.userRights != null && this.prop1.userRights.includes(value)
+      return this.user.userRights != null && this.user.userRights.includes(value)
     },
     checkedBoxNavigation(value) {
       return value
     },
     update(event) {
       let users = new Users()
-      let data = {
-        "userId": Number(this.userId),
-        "value": Number(event.target.getAttribute("data-value")),
-        "set": event.target.checked
+      let data: UpdateRightRequest = {
+        userId: Number(this.user.id),
+        value: Number(event.target.getAttribute("data-value")),
+        set: event.target.checked
       }
 
       users.update(data, [{name: "field", value: event.target.getAttribute("data-type")}])
     },
     addToHotSwitch(event) {
-      // TODO: Тут надо добавить запрос на добавление пользоваля в таблицу с быстрими сменами
       let users = new Users()
 
       let shadowRoot = document
-          .getElementById("user-line-" + this.prop1.id)
+          .getElementById("user-line-" + this.user.id)
           .shadowRoot
 
       let input = shadowRoot
-          .getElementById("input" + this.prop1.id)
+          .getElementById("input" + this.user.id)
           .value
 
-      let data = {
-        "fromId": this.prop1.id,
-        "toId": Number(shadowRoot.getElementById(input).getAttribute("data-id"))
+      let data: AddToSwitcherRequest = {
+        fromId: this.user.id,
+        toId: Number(shadowRoot.getElementById(input).getAttribute("data-id"))
       }
 
       users.addToSwitcher(data)
 
+    },
+    removeHotSwitch(from: number, to: number) {
+      let users = new Users()
+      let data: RemoveFromSwitcherRequest = {
+        fromId: from,
+        toId: to
+      }
+
+      users.removeFromSwitcher(data)
     }
   },
   beforeMount() {
-    console.log(this.prop1)
+    console.log(this.urwd)
   }
 }
 </script>
@@ -247,4 +275,22 @@ input {
   border-right: 0px solid transparent;
   outline: none;
 }
+
+.hot-switch-user-line {
+  display: flex;
+  flex-direction: row;
+  padding: 8px 15px;
+}
+
+.hot-switch-user-name {
+  font-size: 20px;
+  margin-right: 10px;
+}
+
+.hot-switch-user-remove-icon {
+  margin-left: 10px;
+  align-items: center;
+  display: flex;
+}
+
 </style>

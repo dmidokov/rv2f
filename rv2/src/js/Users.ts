@@ -2,8 +2,8 @@ import {UrlBuilder} from "./UrlBuilder";
 import {Requests} from "./Requests";
 import {Notification} from "./Notification/Notification";
 
-type UpdateRightRequest = {
-    id: number,
+export type UpdateRightRequest = {
+    userId: number,
     value: number
     set: boolean
 }
@@ -11,6 +11,50 @@ type UpdateRightRequest = {
 export type Params = {
     name: string,
     value: string
+}
+
+export type RightsWithDescription = {
+    name: string,
+    value: string
+}
+
+export type NavigationItem = {
+    id: Number,
+    title: string,
+    enabled: boolean
+}
+
+export type ChildsItem = {
+    id: Number,
+    login: string
+}
+
+export type HotSwitchItem = {
+    id: Number,
+    login: string
+}
+
+export type UserResponse = {
+    icon: string
+    userName: string
+    createTime: string
+    updateTime: string
+    startPage: string
+    userRightsWithDesription: Array<RightsWithDescription>
+    userRights: Array<Number>
+    navigation: Array<NavigationItem>
+    childs: Array<ChildsItem>
+    hotSwitch: Array<HotSwitchItem>
+}
+
+export type AddToSwitcherRequest = {
+    fromId: number,
+    toId: number
+}
+
+export type RemoveFromSwitcherRequest = {
+    fromId: number,
+    toId: number
 }
 
 export class Users {
@@ -64,16 +108,13 @@ export class Users {
         let result = await (new Requests()).get(link)
         if (result.ok) {
             let json = await result.json()
-            if (json.data["image-name"]) {
-                return json.data["image-name"]
-            } else {
-                return null
-            }
+            return json.data["image-name"] ?? ""
         }
     }
 
-    public async get(id: number): Promise<object> {
+    public async get(id: number): Promise<UserResponse> {
 
+        let res: UserResponse
         const link = (new UrlBuilder()).build("api/users/" + id.toString())
 
         let result = await (new Requests()).get(link)
@@ -82,7 +123,7 @@ export class Users {
             json = await result.json()
             return json.data
         } else {
-            return []
+            return res
         }
 
     }
@@ -99,9 +140,22 @@ export class Users {
         }
     }
 
-    public async addToSwitcher(data: object) {
+    public async addToSwitcher(data: AddToSwitcherRequest) {
         const link = (new UrlBuilder()).build("api/users/switcher")
         let result = await (new Requests()).put(link, data)
+        if (result.ok) {
+            return true
+        } else {
+            let errorText = await result.text()
+            new Notification(errorText, Notification.typeError)
+            return false
+        }
+    }
+
+    public async removeFromSwitcher(data: RemoveFromSwitcherRequest) {
+        const link = (new UrlBuilder()).build("api/users/switcher")
+        let result = await (new Requests()).delete(link, data)
+        console.log(result)
         if (result.ok) {
             return true
         } else {

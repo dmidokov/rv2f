@@ -100,7 +100,7 @@ export default {
 
       let result = await org.create()
 
-      if (result.status == 'OK') {
+      if (result.ok) {
         this.$emit('orgAdded', result.data)
 
         new Notification(

@@ -1,7 +1,7 @@
 <template>
   <div class="users-block">
     <div class="title">Users</div>
-    <div class="user-line ">
+    <div class="user-line user-line-header">
       <div class="table-cell">Name</div>
       <div class="table-cell">Create Time</div>
       <div class="table-cell">Update Time</div>
@@ -15,19 +15,22 @@
         class="user-line user-line-background"
         v-for="user in users"
     >
-      <div :data-line-index="'user-line-' + user.id" class="table-cell">{{ user.userName }}</div>
-      <div :data-line-index="'user-line-' + user.id" class="table-cell">{{ user.createTime }}</div>
-      <div :data-line-index="'user-line-' + user.id" class="table-cell">{{ user.updateTime }}</div>
-      <div :data-line-index="'user-line-' + user.id" class="table-cell">{{ user.type }}</div>
-      <div :data-line-index="'user-line-' + user.id" class="table-cell">
-        <img
-            :data-id="user.id"
-            :data-name="user.userName"
-            src="/icons/close-icon-red.svg"
-            @click="deleteUser"
-            alt="close"
-        >
+      <div class="user-main-info">
+        <div :data-line-index="'user-line-' + user.id" class="table-cell">{{ user.userName }}</div>
+        <div :data-line-index="'user-line-' + user.id" class="table-cell">{{ user.createTime }}</div>
+        <div :data-line-index="'user-line-' + user.id" class="table-cell">{{ user.updateTime }}</div>
+        <div :data-line-index="'user-line-' + user.id" class="table-cell">{{ user.type }}</div>
+        <div :data-line-index="'user-line-' + user.id" class="table-cell">
+          <img
+              :data-id="user.id"
+              :data-name="user.userName"
+              src="/icons/close-icon-red.svg"
+              @click="deleteUser"
+              alt="close"
+          >
+        </div>
       </div>
+      <div class="user-full-info" :id="'user-line-' + user.id">---</div>
     </div>
     <div class="buttons-block">
       <button-add
@@ -50,19 +53,18 @@
 
 </template>
 
-<script>
+<script lang="ts">
 
 import ButtonAdd from "./Buttons/ButtonAdd.vue";
 import {ModalsManager} from "../js/ModalsManager";
-import {Users} from "../js/Users";
+import {Users, UserResponse, RightsWithDescription} from "../js/Users";
 import Confirmation from "./Modals/Confirmation.vue";
 import ModalAddNewUser from "./Modals/ModalAddNewUser.vue";
-import UserInfo from "./userInfo.ce.vue";
-import {defineCustomElement} from "vue";
+import {UserInfoCustom, register} from "../js/CustomElements.js";
 
 export default {
   name: "Users",
-  components: {ButtonAdd, Confirmation, ModalAddNewUser, UserInfo},
+  components: {ButtonAdd, Confirmation, ModalAddNewUser},
   data() {
     return {
       users: [],
@@ -109,19 +111,35 @@ export default {
       let element = document.getElementsByName(lineName)[0]
 
       let id = lineName.split("-")[2];
+      let user: UserResponse = await (new Users()).get(id)
 
-      let user = await (new Users()).get(id)
+      let newElement = document.createElement("user-info")
+
+      console.log(user.createTime)
+      console.log(user.userRightsWithDesription)
+
+      let r: Array<RightsWithDescription> = []
+
+      user.userRightsWithDesription.forEach((v, i) => {
+        r.push({
+          "name": v.name,
+          "value": v.value
+        })
+      })
+
+      console.log(r.toString())
+
+
+
+      let a = new UserInfoCustom({
+        "user":user
+      })
+
+      a.setAttribute("id", lineName)
+      a.setAttribute('class', 'dynamic-user-info-container')
 
       if (!document.getElementById(lineName)) {
-        let newElement = new this.UserInfoDynamic({
-          prop1: user,
-          userId: id
-        })
-
-        newElement.setAttribute("id", lineName)
-        newElement.setAttribute('class', 'dynamic-user-info-container')
-
-        element.after(newElement)
+        element.after(a)
       } else {
         document.getElementById(lineName).remove()
       }
@@ -158,8 +176,10 @@ export default {
   beforeMount() {
     this.loadUsers()
     document.addEventListener("keyup", this.closeLast)
-    this.UserInfoDynamic = defineCustomElement(UserInfo)
-    customElements.define('user-info-dynamic', this.UserInfoDynamic)
+
+  },
+  beforeCreate() {
+
   }
 }
 </script>
@@ -182,12 +202,16 @@ export default {
 .user-line {
   border-bottom: 1px solid var(--stroke-separatot-primary);
   width: 90%;
-  flex-direction: row;
+  flex-direction: column;
   display: flex;
   text-align: center;
   padding-top: 10px;
   padding-bottom: 10px;
   justify-content: space-between;
+}
+
+.user-line-header {
+  flex-direction: row;
 }
 
 .user-line-background:nth-child(odd) {
@@ -251,5 +275,17 @@ export default {
   justify-content: left;
   flex-wrap: wrap;
   align-content: stretch;
+}
+
+.user-main-info {
+  width: 100%;
+  flex-direction: row;
+  display: flex;
+  text-align: center;
+  justify-content: space-between;
+}
+
+.user-full-info {
+  display: none;
 }
 </style>

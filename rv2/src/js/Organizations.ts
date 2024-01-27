@@ -38,7 +38,7 @@ export class Organizations {
         let result = await (new Requests()).put(link, this.buildCreate())
         let json = await result.json()
 
-        if (json.status == "OK") {
+        if (json.status == "ok") {
             return json
         } else {
             return {'status': 'error', 'error': json.error}

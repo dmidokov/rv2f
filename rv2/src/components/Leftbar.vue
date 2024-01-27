@@ -1,11 +1,8 @@
 <template>
   <div class="left-bar">
     <div class="sidebar-sub-block sidebar-top-block">
-      <div class="account-icon icon-shadow">
-        <img
-            id="accountIcon"
-            :src="accountIcon"
-        >
+      <div id="accountIconBlock" class="account-icon icon-shadow">
+        <canvas id="accountIcon"></canvas>
       </div>
     </div>
     <div class="sidebar-sub-block sidebar-middle-block">
@@ -36,7 +33,7 @@ export default {
     return {
       organizations: {},
       navigation: [],
-      accountIcon: '/icons/img.png',
+      accountIcon: '',
     }
   }
   ,
@@ -54,8 +51,31 @@ export default {
     },
     getAccountIcon() {
       (new Users()).getIcon().then(res => {
-        this.accountIcon = (res ?? '/icons/img.png')
+        this.accountIcon = this.createLogo(res)
       })
+    },
+    createLogo(imgSource = ""){
+      const canvas = document.getElementById("accountIcon")
+      const ctx = canvas.getContext("2d")
+
+      console.log(imgSource)
+
+      if (imgSource == "") {
+        ctx.fillStyle = "#004878"
+        ctx.fillRect(0, 0, 60, 60)
+
+        ctx.fillStyle = "white"
+        ctx.font = "30px roboto";
+        ctx.fillText("AD", 14, 39, 35)
+        ctx.fillStyle = "red"
+      } else {
+        const img = new Image()
+        img.src = imgSource
+        img.onload = () => {
+          console.log("draw")
+          ctx.drawImage(img, 0, 0, 60, 60)
+        }
+      }
     }
   },
   beforeMount() {
@@ -69,6 +89,7 @@ export default {
         window.location.href = "#/login"
       }
     }, 30000)
+
   }
 }
 </script>
