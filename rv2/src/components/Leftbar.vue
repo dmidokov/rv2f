@@ -2,7 +2,15 @@
   <div class="left-bar">
     <div class="sidebar-sub-block sidebar-top-block">
       <div id="accountIconBlock" class="account-icon icon-shadow">
-        <canvas id="accountIcon"></canvas>
+        <canvas width="60" height="60" id="accountIcon"></canvas>
+      </div>
+    </div>
+    <div class="hot-switch-accounts-list">
+      <div v-for="user in accountHotSwitch" class="hot-switch-account-item">
+        <img width="50" height="50" :src="user.icon" :title="user.userName" :id="user.id" @click="switchAccount(user.id)">
+      </div>
+      <div class="hot-switch-list-spine">
+        switch
       </div>
     </div>
     <div class="sidebar-sub-block sidebar-middle-block">
@@ -20,7 +28,7 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import {Auth} from "../js/Auth"
 import {Navigation} from "../js/Navigation"
 import LeftBarNavigation from "../components/LeftBarNavigation.vue"
@@ -34,6 +42,7 @@ export default {
       organizations: {},
       navigation: [],
       accountIcon: '',
+      accountHotSwitch: []
     }
   }
   ,
@@ -54,11 +63,16 @@ export default {
         this.accountIcon = this.createLogo(res)
       })
     },
-    createLogo(imgSource = ""){
+    getAccountHotSwitch() {
+      (new Users()).getHotSwitch().then(res => {
+        if (res) {
+          this.accountHotSwitch = res
+        }
+      })
+    },
+    createLogo(imgSource = "") {
       const canvas = document.getElementById("accountIcon")
       const ctx = canvas.getContext("2d")
-
-      console.log(imgSource)
 
       if (imgSource == "") {
         ctx.fillStyle = "#004878"
@@ -76,11 +90,15 @@ export default {
           ctx.drawImage(img, 0, 0, 60, 60)
         }
       }
+    },
+    switchAccount(id:number) {
+      let result = (new Users()).switchAccount(id)
     }
   },
   beforeMount() {
     this.showNavigation()
     this.getAccountIcon()
+    this.getAccountHotSwitch()
 
     let timer = setInterval(async function () {
       let response = await new Auth().authCheck()
@@ -126,10 +144,11 @@ export default {
   max-width: 70px;
   background: var(--background-content);
   border-right: 2px solid var(--stroke-separatot-primary);
-  overflow: hidden;
+  /*overflow: hidden;*/
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  position: relative;
 }
 
 .sidebar-sub-block {
@@ -138,10 +157,13 @@ export default {
   text-align: center;
   display: flex;
   justify-content: center;
+  position: relative;
+  z-index: 1;
 }
 
 .sidebar-top-block {
   margin-top: 15px;
+  background: inherit;
 }
 
 .sidebar-bottom-block {
@@ -159,5 +181,55 @@ export default {
   width: 40px;
   height: 40px;
   cursor: pointer;
+}
+
+.hot-switch-accounts-list {
+  position: absolute;
+  display: flex;
+  z-index: 0;
+  margin-top: 15px;
+  right: -25px;
+  height: 60px;
+  background: var(--background-secondary);
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+  padding-left: 25px;
+}
+
+.hot-switch-accounts-list:hover {
+  animation-duration: 2s;
+  transform: translateX(100%) translate(-50px);
+  transition: 1s;
+  transition-timing-function: cubic-bezier(0.3, 0.2, 0.3, 1.6);
+}
+
+.hot-switch-account-item {
+  margin-left: 10px;
+  margin-right: 10px;
+  display: flex;
+  justify-content: center;
+  border-radius: 50px;
+  width: 50px;
+  height: 50px;
+  align-self: center;
+}
+
+.hot-switch-account-item img {
+  cursor: pointer;
+  border-radius: 50px;
+}
+
+.hot-switch-list-spine {
+  background: var(--background-accent-themed);
+  width: 25px;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+  writing-mode: vertical-rl;
+  color: white;
+  font-weight: bold;
+  font-size: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 </style>

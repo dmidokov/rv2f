@@ -155,7 +155,31 @@ export class Users {
     public async removeFromSwitcher(data: RemoveFromSwitcherRequest) {
         const link = (new UrlBuilder()).build("api/users/switcher")
         let result = await (new Requests()).delete(link, data)
-        console.log(result)
+        if (result.ok) {
+            return true
+        } else {
+            let errorText = await result.text()
+            new Notification(errorText, Notification.typeError)
+            return false
+        }
+    }
+
+    public async getHotSwitch() {
+        const link = (new UrlBuilder()).build("api/users/switcher")
+        let result = await (new Requests()).get(link)
+        if (result.ok) {
+            let json = await result.json()
+            return json.data
+        } else {
+            let errorText = await result.text()
+            new Notification(errorText, Notification.typeError)
+            return false
+        }
+    }
+
+    public async switchAccount(id: number): Promise<boolean> {
+        const link = (new UrlBuilder()).build("api/user/switcher/switch", [{name: "id", value: id.toString()}])
+        let result = await (new Requests()).get(link)
         if (result.ok) {
             return true
         } else {
