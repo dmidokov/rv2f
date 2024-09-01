@@ -30,7 +30,7 @@
           >
         </div>
       </div>
-      <div class="user-full-info" :id="'user-line-' + user.id">---</div>
+
     </div>
     <div class="buttons-block">
       <button-add
@@ -106,6 +106,9 @@ export default {
       })
     },
     async showUserInfo(event) {
+
+      console.log("Hello")
+
       let target = event.target
       let lineName = target.getAttribute("data-line-index")
       let element = document.getElementsByName(lineName)[0]
@@ -127,10 +130,6 @@ export default {
         })
       })
 
-      console.log(r.toString())
-
-
-
       let a = new UserInfoCustom({
         "user":user
       })
@@ -138,9 +137,13 @@ export default {
       a.setAttribute("id", lineName)
       a.setAttribute('class', 'dynamic-user-info-container')
 
+      console.log(lineName)
+
       if (!document.getElementById(lineName)) {
+        console.log("after")
         element.after(a)
       } else {
+        console.log("remove")
         document.getElementById(lineName).remove()
       }
     },
