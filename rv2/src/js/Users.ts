@@ -178,7 +178,7 @@ export class Users {
     }
 
     public async switchAccount(id: number): Promise<boolean> {
-        const link = (new UrlBuilder()).build("api/user/switcher/switch", [{name: "id", value: id.toString()}])
+        const link = (new UrlBuilder()).build("api/users/switcher/switch", [{name: "id", value: id.toString()}])
         let result = await (new Requests()).get(link)
         if (result.ok) {
             return true
