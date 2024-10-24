@@ -181,7 +181,9 @@ export class Users {
         const link = (new UrlBuilder()).build("api/users/switcher/switch", [{name: "id", value: id.toString()}])
         let result = await (new Requests()).get(link)
         if (result.ok) {
-            return true
+            new Notification("Switched to another user", Notification.typeNotification)
+            let json = await result.json()
+            return json.data
         } else {
             let errorText = await result.text()
             new Notification(errorText, Notification.typeError)
