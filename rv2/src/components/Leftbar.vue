@@ -7,7 +7,8 @@
     </div>
     <div class="hot-switch-accounts-list">
       <div v-for="user in accountHotSwitch" class="hot-switch-account-item">
-        <img width="50" height="50" :src="user.icon" :title="user.userName" :id="user.id" @click="switchAccount(user.id)">
+        <img width="50" height="50" :src="user.icon" :title="user.userName" :id="user.id"
+             @click="switchAccount(user.id)">
       </div>
       <div class="hot-switch-list-spine">
         switch
@@ -83,6 +84,8 @@ export default {
         ctx.fillText("AD", 14, 39, 35)
         ctx.fillStyle = "red"
       } else {
+        ctx.fillStyle = "#004878"
+        ctx.fillRect(0, 0, 60, 60)
         const img = new Image()
         img.src = imgSource
         img.onload = () => {
@@ -91,8 +94,11 @@ export default {
         }
       }
     },
-    switchAccount(id:number) {
-      let result = (new Users()).switchAccount(id)
+    switchAccount(id: number) {
+      let result = (new Users()).switchAccount(id).then(res => {
+        console.log(res)
+        this.accountIcon = this.createLogo(res['icon2'])
+      })
     }
   },
   beforeMount() {
