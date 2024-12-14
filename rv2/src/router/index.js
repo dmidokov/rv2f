@@ -11,6 +11,7 @@ import Branches from "../components/Branches.vue";
 import Main from '../components/Main.vue'
 import Account from '../components/Account.vue'
 import BranchSelector from "../components/BranchSelector.vue";
+import UserGroups from "../components/UserGroups.vue";
 
 const routes = [
     {
@@ -56,7 +57,7 @@ const routes = [
             navigation: Leftbar,
             content: Users
         },
-    },    
+    },
     {
         path: '/settings',
         name: 'settings',
@@ -95,6 +96,14 @@ const routes = [
         components: {
             navigation: Leftbar,
             content: BranchSelector
+        }
+    },
+    {
+        path: '/group',
+        name: 'group',
+        components: {
+            navigation: Leftbar,
+            content: UserGroups
         }
     }
 ]

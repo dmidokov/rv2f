@@ -5,7 +5,7 @@ import {UrlBuilder} from "./UrlBuilder";
 export class Auth {
     authorize(userName: string, userPass: string): boolean {
 
-        const link = 'https://' + window.location.hostname + ':443/auth'
+        const link = '/auth' // TODO:: удалить этот хардкод
         let request = new Requests()
 
         let data = {
@@ -13,25 +13,24 @@ export class Auth {
             "user_pass": userPass
         }
 
+        console.log("link", link);
+
         request.post(link, data)
             .then(response => {
                 if (response.ok) {
                     response
                         .json()
                         .then(json => {
-                            console.log(json["data"]["startPage"])
-                            console.log(json["data"])
                             if (json["status"] === "ok") {
-                                console.log(json["data"]["startPage"])
-                                if (json["data"]["startPage"] !== "undefined") {
+                                if (json["data"]["startPage"] && json["data"]["startPage"] !== "undefined") {
                                     window.location.href = json["data"]["startPage"]
                                 } else {
                                     window.location.href = "/"
                                 }
                                 return true
                             } else {
-                                if (json['status'] == "Error") {
-                                    new Notification(json['error'], Notification.typeError)
+                                if (json["status"] == "error") {
+                                    new Notification(json.errors[0], Notification.typeError)
                                 }
                                 return false;
                             }
@@ -54,7 +53,7 @@ export class Auth {
     }
 
     logout() {
-        const link = 'https://' + window.location.hostname + ':443/logout'
+        const link = '/logout'
         let request = new Requests()
 
         request.post(link).then(response => {
@@ -72,7 +71,7 @@ export class Auth {
 
     async authCheck() {
         let request = new Requests()
-        let response = await request.get((new UrlBuilder()).build("api/authcheck"))
+        let response = await request.get((new UrlBuilder()).build("/api/authcheck"))
         if (response.ok) {
             return true
         }

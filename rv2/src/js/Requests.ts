@@ -11,7 +11,6 @@ export class Requests {
     }
 
     async post(link: string, data: object = {}): Promise<Response> {
-
         return await fetch(link, {
             method: 'POST',
             headers: {
@@ -32,7 +31,7 @@ export class Requests {
         });
     }
 
-    async delete(link: string, data:Object): Promise<Response> {
+    async delete(link: string, data:object = {}): Promise<Response> {
 
         return await fetch(link, {
             method: 'DELETE',

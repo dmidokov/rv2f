@@ -1,4 +1,9 @@
-import {Params} from "./Users";
+// import {Params} from "./Users";
+
+export type Params = {
+    name: string,
+    value: string
+}
 
 export class UrlBuilder {
     build(path: string, params: Array<Params> = []): string {
@@ -7,7 +12,6 @@ export class UrlBuilder {
 
             params.forEach(
                 (p, i) => {
-                    console.log(p)
                     if (i == 0) {
                         paramString += "?" + p.name + "=" + p.value
                     } else {
@@ -16,6 +20,7 @@ export class UrlBuilder {
                 }
             )
         }
-        return 'https://' + window.location.hostname + ':443/' + path + paramString
+
+        return  path + paramString
     }
 }
