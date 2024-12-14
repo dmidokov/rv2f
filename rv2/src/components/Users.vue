@@ -75,6 +75,7 @@ export default {
       modals: new ModalsManager(),
       addNewUserText: "Add New",
       UserInfoDynamic: null,
+      uVal: {},
     }
   },
   methods: {
@@ -106,24 +107,18 @@ export default {
       })
     },
     async showUserInfo(event) {
-
-      console.log("Hello")
-
       let target = event.target
       let lineName = target.getAttribute("data-line-index")
       let element = document.getElementsByName(lineName)[0]
 
       let id = lineName.split("-")[2];
-      let user: UserResponse = await (new Users()).get(id)
+      this.uVal = await (new Users()).get(id)
 
       let newElement = document.createElement("user-info")
 
-      console.log(user.createTime)
-      console.log(user.userRightsWithDesription)
-
       let r: Array<RightsWithDescription> = []
 
-      user.userRightsWithDesription.forEach((v, i) => {
+      this.uVal.userRightsWithDesription.forEach((v, i) => {
         r.push({
           "name": v.name,
           "value": v.value
@@ -131,19 +126,15 @@ export default {
       })
 
       let a = new UserInfoCustom({
-        "user":user
+        "user": this.uVal
       })
 
       a.setAttribute("id", lineName)
       a.setAttribute('class', 'dynamic-user-info-container')
 
-      console.log(lineName)
-
       if (!document.getElementById(lineName)) {
-        console.log("after")
         element.after(a)
       } else {
-        console.log("remove")
         document.getElementById(lineName).remove()
       }
     },
@@ -176,10 +167,12 @@ export default {
       })(this, userId)
     },
   },
+  updateGroups1() {
+
+  },
   beforeMount() {
     this.loadUsers()
     document.addEventListener("keyup", this.closeLast)
-
   },
   beforeCreate() {
 

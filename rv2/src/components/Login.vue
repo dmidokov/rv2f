@@ -52,7 +52,14 @@ export default {
     signIn() {
       let auth = new Auth()
       auth.authorize(this.userName, this.userPass)
-    }
+    },
+  },
+  mounted() {
+    let eventSource = new EventSource("/sse/login");
+
+    eventSource.onmessage = function (event) {
+      console.log("Новое сообщение", event.data);
+    };
   }
 }
 

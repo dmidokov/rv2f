@@ -3,6 +3,15 @@ import {Requests} from "./Requests";
 import {Notification} from "./Notification/Notification";
 
 
+interface Org {
+    createTime: Number,
+    creator: String,
+    host: String,
+    id: Number,
+    name: String,
+    updateTime: Number,
+};
+
 export class Organizations {
 
     private name: string
@@ -12,23 +21,24 @@ export class Organizations {
 
     private checkErrors: Array<string> = []
 
-    public constructor(name, host, adminName, adminPassword: string) {
+    public constructor(name: string, host: string, adminName: string, adminPassword: string) {
         this.name = name
         this.host = host
         this.adminPassword = adminPassword
         this.adminName = adminName
     }
 
-    public async load(): Promise<object> {
+    public async load(): Promise<Org[]> {
 
         const link = (new UrlBuilder()).build("api/organizations")
 
         let result = await (new Requests()).get(link)
-        let json;
+        let json: any;
+
         if (result.ok) {
             json = await result.json()
-            return json.data
-        } else {
+            return json.data as Org[]
+        } else { // TODO: короче тут надо обработаь ошибку чтоб на странице можно было показать что нам недоступен просотр этой страницы
             return []
         }
     }
@@ -56,7 +66,7 @@ export class Organizations {
 
     public async delete(id: number) {
         const link = (new UrlBuilder()).build("api/organizations/" + id.toString())
-        let result = await (new Requests()).delete(link, id)
+        let result = await (new Requests()).delete(link)
         if (result.ok) {
             new Notification("Organization Was Deleted", Notification.typeNotification)
             return true

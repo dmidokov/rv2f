@@ -1,6 +1,6 @@
 <template>
   <div class="user-icon">
-    <img :src=user.icon :title="icon" alt="User Icon">
+    <img :src=user.icon :title="user.icon" alt="User Icon">
   </div>
   <div class="user-data-container">
     <div class="user-info-line user-name">
@@ -21,7 +21,6 @@
     </div>
 
   </div>
-
 
   <div class="user-data-container">
     <div class="user-data-container-header">Rights</div>
@@ -66,12 +65,33 @@
     </div>
   </div>
 
+  <div class="user-data-container">
+    <div class="user-data-container-header">Groups</div>
+    <div>
+      <input :id="`group_input_`+user.id" type="select" list="userGroups">
+      <datalist id="userGroups">
+        <option :id="group.group_name" :data-id="group.group_id" v-for="group in user.groups">{{
+            group.group_name
+          }}
+        </option>
+      </datalist>
+      <button type="button" class="ok-button" @click="addGroup">Add</button>
+    </div>
+    <div>
+      <div v-for="hs in user.assignedGroups" class="hot-switch-user-line">
+        <div class="hot-switch-user-name">{{ hs.group_name }}</div>
+        <div class="hot-switch-user-remove-icon">
+          <img width="20" height="20" src="/icons/close-icon-red.svg" @click="removeUserGroup(user.id, hs.group_id)">
+        </div>
+      </div>
+    </div>
+  </div>
+
 </template>
 
 <script setup lang="ts">
 import {defineProps} from "vue";
-import {ChildsItem, NavigationItem, RightsWithDescription, UserResponse, UpdateRightRequest} from "../js/Users"
-
+import {ChildsItem, NavigationItem, RightsWithDescription, UserResponse} from "../js/Users"
 
 defineProps<{
   user: UserResponse
@@ -81,11 +101,25 @@ defineProps<{
 
 <script lang="ts">
 
-import {AddToSwitcherRequest, RemoveFromSwitcherRequest, UpdateRightRequest, Users} from "../js/Users";
+import {
+  AddToSwitcherRequest,
+  RemoveFromSwitcherRequest,
+  Users,
+  UpdateRightRequest,
+  UpdateGroupsRequest, UnassignGroupsRequest
+} from "../js/Users";
+import {computed} from "vue";
 
 export default {
   name: "userInfo",
   props: ["user"],
+  data() {
+    return {
+      user: computed(() => {
+        return this.$props.user
+      }),
+    }
+  },
   methods: {
     checkedBoxRights(value) {
       return this.user.userRights != null && this.user.userRights.includes(value)
@@ -110,17 +144,23 @@ export default {
           .getElementById("user-line-" + this.user.id)
           .shadowRoot
 
-      let input = shadowRoot
-          .getElementById("input" + this.user.id)
-          .value
+      let input = shadowRoot.getElementById("input" + this.user.id).value
 
       let data: AddToSwitcherRequest = {
         fromId: this.user.id,
         toId: Number(shadowRoot.getElementById(input).getAttribute("data-id"))
       }
 
-      users.addToSwitcher(data)
-
+      let result = users.addToSwitcher(data)
+      result.then(r => {
+        if (this.user.hotSwitch == null) {
+          this.user.hotSwitch = []
+        }
+        this.user.hotSwitch.push({
+          'id': data.toId,
+          'login': input,
+        })
+      })
     },
     removeHotSwitch(from: number, to: number) {
       let users = new Users()
@@ -129,12 +169,59 @@ export default {
         toId: to
       }
 
-      users.removeFromSwitcher(data)
+      let result = users.removeFromSwitcher(data)
+      result.then(r => {
+        this.user.hotSwitch = this.user.hotSwitch.filter(v => {
+          return v['id'] !== data.toId
+        })
+      })
+    },
+    addGroup() {
+      let users = new Users()
+
+      let shadowRoot = document
+          .getElementById("user-line-" + this.user.id)
+          .shadowRoot
+
+      let input = shadowRoot.getElementById("group_input_" + this.user.id).value
+
+      let data: UpdateGroupsRequest = {
+        userId: this.user.id,
+        groupId: Number(shadowRoot.getElementById(input).getAttribute("data-id"))
+      }
+
+      let result = users.addGroupToUser(data, input)
+      result.then(r => {
+        this.user.assignedGroups.push({
+          'group_id': data.groupId,
+          'user_id': data.userId,
+          'group_name': input
+        })
+      })
+    },
+    removeUserGroup(user_id: number, group_id: number) {
+      let users = new Users()
+
+      let data: UnassignGroupsRequest = {
+        userId: Number(user_id),
+        groupId: Number(group_id),
+      }
+
+      let result = users.unassignUserGroup(data)
+
+      result.then(r => {
+        this.user.assignedGroups = this.user.assignedGroups.filter(v => {
+          return v['group_id'] !== data.groupId
+        })
+      })
     }
   },
   beforeMount() {
-    console.log(this.urwd)
-  }
+
+  },
+  mounted() {
+
+  },
 }
 </script>
 

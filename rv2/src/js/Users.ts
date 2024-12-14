@@ -8,6 +8,16 @@ export type UpdateRightRequest = {
     set: boolean
 }
 
+export type UpdateGroupsRequest = {
+    userId: number,
+    groupId: number,
+}
+
+export type UnassignGroupsRequest = {
+    userId: number,
+    groupId: number
+}
+
 export type Params = {
     name: string,
     value: string
@@ -34,6 +44,12 @@ export type HotSwitchItem = {
     login: string
 }
 
+export type AssignedGroups = {
+    group_id: Number,
+    user_id: Number,
+    group_name: string
+}
+
 export type UserResponse = {
     icon: string
     userName: string
@@ -45,6 +61,7 @@ export type UserResponse = {
     navigation: Array<NavigationItem>
     childs: Array<ChildsItem>
     hotSwitch: Array<HotSwitchItem>
+    assignGroups: Array<AssignedGroups>
 }
 
 export type AddToSwitcherRequest = {
@@ -77,7 +94,7 @@ export class Users {
 
     public async delete(id: number) {
         const link = (new UrlBuilder()).build("api/users/" + id.toString())
-        let result = await (new Requests()).delete(link, id)
+        let result = await (new Requests()).delete(link)
         if (result.ok) {
             new Notification("User Was Deleted", Notification.typeNotification)
             return true
@@ -190,4 +207,30 @@ export class Users {
             return false
         }
     }
+
+    public async addGroupToUser(data: UpdateGroupsRequest, groupName: string) {
+        const link = (new UrlBuilder()).build("api/users/group")
+        let result = await (new Requests()).put(link, data)
+        if (result.ok) {
+            return true
+        } else {
+            let errorText = await result.text()
+            new Notification(errorText, Notification.typeError)
+            return false
+        }
+    }
+
+    public async unassignUserGroup(data: UnassignGroupsRequest) {
+        const link = (new UrlBuilder()).build("api/users/group")
+        let result = await (new Requests()).delete(link, data)
+        if (result.ok) {
+            return true
+        } else {
+            let errorText = await result.text()
+            new Notification(errorText, Notification.typeError)
+            return false
+        }
+    }
+
+
 }

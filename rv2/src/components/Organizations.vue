@@ -1,5 +1,6 @@
 <template>
-  <div class="organizations-block">
+
+  <div class="organizations-block" v-if="organizationAvailable">
     <div class="title">Organizations</div>
     <div class="organization-line ">
       <div class="table-cell">Name</div>
@@ -56,6 +57,7 @@ export default {
   data() {
     return {
       organizations: [],
+      organizationAvailable: true,
       confirmationModalHeader: "Вы действительно хотите удалить компанию 'control'",
       deleteOrgId: -1,
       confirmFunc: null,
@@ -76,6 +78,11 @@ export default {
       let org = new Organizations()
 
       org.load().then(r => {
+        if (r !== []) {
+          this.organizationAvailable = true
+        } else {
+          this.organizationAvailable = false
+        }
         this.organizations = r
       })
     },

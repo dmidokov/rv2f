@@ -27,6 +27,8 @@
       />
     </div>
   </div>
+  <div class="left-bar-under">
+  </div>
 </template>
 
 <script lang="ts">
@@ -95,8 +97,7 @@ export default {
       }
     },
     switchAccount(id: number) {
-      let result = (new Users()).switchAccount(id).then(res => {
-        console.log(res)
+      (new Users()).switchAccount(id).then(res => {
         this.accountIcon = this.createLogo(res['icon2'])
       })
     }
@@ -154,7 +155,21 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  position: fixed;
+  height: 100vh;
+}
+
+.left-bar-under {
+  min-width: 70px;
+  max-width: 70px;
+  background: transparent;
+  border-right: 2px solid transparent;
+  /*overflow: hidden;*/
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   position: relative;
+  z-index: -100;
 }
 
 .sidebar-sub-block {
