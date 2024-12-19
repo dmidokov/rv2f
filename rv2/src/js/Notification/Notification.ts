@@ -9,7 +9,7 @@ export class Notification {
     private notification: HTMLElement
 
     private NOTIFICATION_BLOCK_NAME = "notifications-block"
-    private NOTIFICATION_BLOCK_STYLE = "position:absolute;" +
+    private NOTIFICATION_BLOCK_STYLE = "position:fixed;" +
         "width:350px;" +
         "height:0px;" +
         "bottom:20px;" +
