@@ -214,8 +214,6 @@ export class Users {
         if (result.ok) {
             return true
         } else {
-            let errorText = await result.text()
-            new Notification(errorText, Notification.typeError)
             return false
         }
     }

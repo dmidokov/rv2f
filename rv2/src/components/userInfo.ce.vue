@@ -109,6 +109,7 @@ import {
   UpdateGroupsRequest, UnassignGroupsRequest
 } from "../js/Users";
 import {computed} from "vue";
+import {Notification} from "../js/Notification/Notification";
 
 export default {
   name: "userInfo",
@@ -192,11 +193,15 @@ export default {
 
       let result = users.addGroupToUser(data, input)
       result.then(r => {
-        this.user.assignedGroups.push({
-          'group_id': data.groupId,
-          'user_id': data.userId,
-          'group_name': input
-        })
+        if (r) {
+          this.user.assignedGroups.push({
+            'group_id': data.groupId,
+            'user_id': data.userId,
+            'group_name': input
+          })
+        } else {
+          new Notification("Something wrong happened", Notification.typeError)
+        }
       })
     },
     removeUserGroup(user_id: number, group_id: number) {
